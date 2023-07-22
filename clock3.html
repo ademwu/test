@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: system-ui;
+            color: rgb(10, 10, 10);
+            text-align: center;
+            font-size: 30px;
+        }
+
+        .record-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .button-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            margin: 10px;
+        }
+
+        #clock {
+            margin-bottom: 20px;
+        }
+
+        h1,
+        .btn {
+            font-size: 30px;
+        }
+
+        table,
+        td,
+        th {
+            border: 1px solid #28da37;
+            border-collapse: collapse;
+            width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="clock"></div>
+    <div class="record-container">
+        <div id="work">
+            <h1>上班打卡</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>名字</th>
+                        <th>時間</th>
+                        <th>狀態</th>
+                    </tr>
+                </thead>
+                <tbody id="work-records"></tbody>
+            </table>
+        </div>
+        <div id="offwork">
+            <h1>下班打卡</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>名字</th>
+                        <th>時間</th>
+                        <th>狀態</th>
+                    </tr>
+                </thead>
+                <tbody id="offwork-records"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="button-container">
+        <button onclick="work()" class="btn">上班打卡</button>
+        <button onclick="offwork()" class="btn">下班打卡</button>
+        <button onclick="exportData()" class="btn">匯出資料</button>
+    </div>
+
+    <script>
+        var workTimes = [];
+        var offWorkTimes = [];
+
+        function currentTime() {
+            let date = new Date();
+            let hh = date.getHours();
+            let mm = date.getMinutes();
+            let ss = date.getSeconds();
+            let session = "AM";
+
+            if (hh === 0) {
+                hh = 12;
+            }
+            if (hh > 12) {
+                hh = hh - 12;
+                session = "PM";
+            }
+
+            hh = (hh < 10) ? "0" + hh : hh;
+            mm = (mm < 10) ? "0" + mm : mm;
+            ss = (ss < 10) ? "0" + ss : ss;
+
+            let time = hh + ":" + mm + ":" + ss + " " + session;
+
+            document.getElementById("clock").innerText = time;
+            let t = setTimeout(function () {
+                currentTime()
+            }, 1000);
+        }
+
+        function initialize() {
+            currentTime();
+            displayWorkRecords();
+            displayOffWorkRecords();
+        }
+
+        function displayWorkRecords() {
+            var workRecords = workTimes.map(function (record) {
+                var [name, time, status] = record.split("\t");
+                return `<tr><td>${name}</td><td>${time}</td><td>${status}</td></tr>`;
+            }).join("");
+            document.getElementById("work-records").innerHTML = workRecords;
+        }
+
+        function displayOffWorkRecords() {
+            var offWorkRecords = offWorkTimes.map(function (record) {
+                var [name, time, status] = record.split("\t");
+                return `<tr><td>${name}</td><td>${time}</td><td>${status}</td></tr>`;
+            }).join("");
+            document.getElementById("offwork-records").innerHTML = offWorkRecords;
+        }
+
+        function work() {
+            var name = prompt("請輸入姓名");
+            var time = document.getElementById("clock").innerText;
+            var status = checkLate(time, "8:00:00 AM") ? "遲到" : "";
+            var record = name + "\t" + time + "\t" + status;
+            workTimes.push(record);
+            displayWorkRecords();
+        }
+
+        function offwork() {
+            var name = prompt("請輸入姓名");
+            var time = document.getElementById("clock").innerText;
+            var status = checkLate(time, "10:10:00 PM") ? "遲到" : "";
+            var record = name + "\t" + time + "\t" + status;
+            offWorkTimes.push(record);
+            displayOffWorkRecords();
+        }
+
+        function checkLate(time, cutoffTime) {
+            var currentTime = new Date("2023-01-01 " + time);
+            var cutoff = new Date("2023-01-01 " + cutoffTime);
+            return currentTime > cutoff;
+        }
+
+        function exportData() {
+            var csvContent = "";
+
+            // 添加工作记录
+            csvContent += "上班打卡\n";
+            workTimes.forEach(function (record) {
+                csvContent += record.replace(/\t/g, ",") + "\n";
+            });
+
+            // 添加下班记录
+            csvContent += "\n下班打卡\n";
+            offWorkTimes.forEach(function (record) {
+                csvContent += record.replace(/\t/g, ",") + "\n";
+            });
+
+            // 將 CSV 內容轉換為 Blob 物件
+            var blob = new Blob([csvContent], { type: "text/csv;charset=ASCII;" });
+
+            // 建立下載連結
+            var link = document.createElement("a");
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", "work_records.csv");
+
+            // 模擬點擊下載連結
+            link.click();
+        }
+
+
+        // 在页面加载完成后调用初始化函数
+        window.addEventListener("load", initialize);
+    </script>
+</body>
+
+</html>

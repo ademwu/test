@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8' />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- 彈出視窗-->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+  <script type="text/javascript"
+    src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"></script>
+  <link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet"
+    type="text/css" />
+
+<!-- 先引入moment.js，這次刪除了integrity屬性 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js"></script>
+
+
+<script type="text/javascript" src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"></script>
+<link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+ 
+
+
+
+
+
+
+
+
+</head>
+<style>
+  .btn:not(.btn-outline):not(.btn-dashed):not(.border-hover):not(.border-active):not(.btn-flush):not(.btn-icon) {
+    border: 0;
+    padding: calc(0.775rem + 1px) calc(1.5rem + 1px);
+  }
+
+  .btn.btn-primary {
+    color: #FFFFFF;
+    border-color: #72d4e1;
+    background-color: #72d4e1;
+
+  }
+
+  .btn.btn-primary:hover {
+    background-color: #4f9bda;
+  }
+
+  .swal2-popup .btn {
+    margin: 15px 5px 0;
+  }
+
+  .btn-active-light {
+    background-color: #D0D0D0;
+  }
+
+  .btn-active-light:hover {
+    background-color: #9D9D9D;
+  }
+
+  .fc-day-today {
+    background: #53FF53 !important;
+  }
+
+  .fc-daygrid-bg-harness {
+    background-color: yellow !important;
+
+  }
+</style>
+
+<body>
+   <div id="visualization"></div>
+  <div id="kt_docs_fullcalendar_selectable"></div>
+ 
+  <script>
+    // 設定moment.js的完整中文本地化
+    moment.locale('zh-cn', {
+      months : '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
+      monthsShort : '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
+      monthsParseExact : true,
+      weekdays : '星期日_星期一_星期二_星期三_星期四_星期五_星期六'.split('_'),
+      weekdaysShort : '周日_周一_周二_周三_周四_周五_周六'.split('_'),
+      weekdaysMin : '日_一_二_三_四_五_六'.split('_'),
+      weekdaysParseExact : true,
+      longDateFormat : {
+        LT : 'HH:mm',
+        LTS : 'HH:mm:ss',
+        L : 'YYYY年MM月DD日',
+        LL : 'YYYY年MM月DD日',
+        LLL : 'YYYY年MM月DD日 HH:mm',
+        LLLL : 'YYYY年MM月DD日 HH:mm',
+      },
+      calendar : {
+        sameDay : '[今天] LT',
+        nextDay : '[明天] LT',
+        nextWeek : 'dddd [下周] LT',
+        lastDay : '[昨天] LT',
+        lastWeek : 'dddd [上周] LT',
+        sameElse : 'L',
+      },
+      relativeTime : {
+        future : '%s後',
+        past : '%s前',
+        s : '幾秒',
+        m : '一分鐘',
+        mm : '%d分鐘',
+        h : '一小時',
+        hh : '%d小時',
+        d : '一天',
+        dd : '%d天',
+        M : '一個月',
+        MM : '%d個月',
+        y : '一年',
+        yy : '%d年',
+      },
+      dayOfMonthOrdinalParse : /\d{1,2}(日|月|年)/,
+      ordinal : function (number, period) {
+        switch (period) {
+          case 'd':
+          case 'D':
+          case 'DDD':
+            return number + '日';
+          case 'M':
+            return number + '月';
+          case 'y':
+          case 'Y':
+            return number + '年';
+          default:
+            return number;
+        }
+      },
+      meridiemParse : /凌晨|早上|上午|中午|下午|晚上/,
+      meridiemHour : function (hour, meridiem) {
+        if (hour === 12) {
+          hour = 0;
+        }
+        if (meridiem === '凌晨' || meridiem === '早上' ||
+            meridiem === '上午') {
+          return hour;
+        } else if (meridiem === '下午' || meridiem === '晚上') {
+          return hour + 12;
+        } else {
+          // '中午'
+          return hour >= 11 ? hour : hour + 12;
+        }
+      },
+      meridiem : function (hour, minute, isLower) {
+        var hm = hour * 100 + minute;
+        if (hm < 600) {
+          return '凌晨';
+        } else if (hm < 900) {
+          return '早上';
+        } else if (hm < 1130) {
+          return '上午';
+        } else if (hm < 1230) {
+          return '中午';
+        } else if (hm < 1800) {
+          return '下午';
+        } else {
+          return '晚上';
+        }
+      },
+    });
+  </script>
+  <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+      var container = document.getElementById('visualization');
+      var items = new vis.DataSet([]);
+
+      var timeline = new vis.Timeline(container, items, {});
+
+
+
+
+
+
+
+      var calendarEl = document.getElementById("kt_docs_fullcalendar_selectable");
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        headerToolbar: {
+          left: "dayGridMonth,timeGridWeek,timeGridDay",
+          center: "title",
+          right: "prev,next today"
+        },
+        buttonText: {
+          today: '本月',
+          month: '月',
+          week: '週',
+          day: '天',
+          list: 'list'
+        },
+        locale: 'zh-tw',
+        initialDate: "2023-07-25",
+        navLinks: true,
+        selectable: true,
+        selectMirror: true,
+
+        // Create new event
+        select: function (arg) {
+
+
+          Swal.fire({
+            html: `
+                            <div id='customPopup' class='custom-popup'>
+                                <div class='popup-content'>
+                                    <div>是否建立新行程？</div>
+                                    <div>行程名稱:</div>
+                                    <input type='text' id='event_name' />
+                                    <div>開始時間:</div>
+                                    <input type='text' id='start_time_picker' />
+                                    <div>結束時間:</div>
+                                    <input type='text' id='end_time_picker'/>
+                                </div>
+                            </div>`,
+            icon: "info",
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: "確認",
+            cancelButtonText: "取消",
+            customClass: {
+              confirmButton: "btn btn-primary",
+              cancelButton: "btn btn-active-light"
+            },
+            didOpen: function () {
+
+              // 在 swal 顯示後初始化 flatpickr
+              flatpickr("#start_time_picker", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+              });
+
+              flatpickr("#end_time_picker", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+              });
+            },
+
+            preConfirm: function () {
+              var title = document.getElementById("event_name").value;
+
+
+              var startTime = document.getElementById("start_time_picker").value;
+              var endTime = document.getElementById("end_time_picker").value;
+              if (title && startTime && endTime) {
+                calendar.addEvent({
+                  title: title,
+                  start: startTime,
+                  end: endTime,
+                  allDay: false
+                });
+                // 在 Vis.js 的 items 中加入新的事件
+                items.add({
+                  id: items.length + 1,
+                  content: title,
+                  start: startTime,
+                  end: endTime,
+                });
+
+                // 重新渲染 Vis.js 時間軸
+                timeline.redraw();
+
+
+              } else {
+                Swal.showValidationMessage("請填寫完整的行程資訊");
+                return false;
+              }
+            }
+          }).then(function (result) {
+            if (result.value) {
+              Swal.fire({
+                text: "已建立新行程",
+                icon: "success",
+                buttonsStyling: false,
+                confirmButtonText: "確認",
+                customClass: {
+                  confirmButton: "btn btn-primary"
+                }
+              });
+            } else if (result.dismiss === "cancel") {
+              Swal.fire({
+                text: "您取消活動建立",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "確認",
+                customClass: {
+                  confirmButton: "btn btn-primary"
+                }
+              });
+            }
+          });
+        },
+
+        //Delete event
+        eventClick: function (arg) {
+
+          Swal.fire({
+            text: "是否刪除此行程?",
+            icon: "warning",
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: "確認",
+            cancelButtonText: "取消",
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            customClass: {
+              confirmButton: "btn btn-primary",
+              cancelButton: "btn btn-active-light"
+            }
+          }).then(function (result) {
+
+            if (result.value) {
+              arg.event.remove();
+
+              Swal.fire({
+                text: "已刪除行程",
+                icon: "success",
+                buttonsStyling: false,
+                confirmButtonText: "確認",
+                customClass: {
+                  confirmButton: "btn btn-primary"
+                }
+              });
+            } else if (result.dismiss === "cancel") {
+              Swal.fire({
+                text: "您取消動作",
+                icon: "error",
+                buttonsStyling: false,
+                confirmButtonText: "確認",
+                customClass: {
+                  confirmButton: "btn btn-primary"
+                }
+              });
+            }
+          });
+        },
+
+
+
+        editable: true,
+        dayMaxEvents: true,
+
+      });
+
+      calendar.render();
+
+
+
+    });
+  </script>
+
+
+
+
+</body>
+
+</html>

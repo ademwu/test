@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>On Scroll to Change Background</title>
+    <meta charset="utf-8" />
+    <style>
+        .droptarget {
+            width: 150px;
+            min-height: 100px;
+            margin: 15px;
+            padding: 10px;
+            border: 1px solid #aaaaaa;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>將底下的文字在二個方框之間拖拉移動</h1>
+    <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <p ondragstart="dragStart(event)" ondrag="dragging(event)" ondragend="dragEnd(event)" draggable="true" id="dragtarget">
+            你可以移動我哦!
+        </p>
+    </div>
+
+    <div class="droptarget" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dropLeave(event)" ></div>
+    
+    <p id="demo1"></p>
+    <p id="demo2"></p>
+    <p id="demo3"></p>
+
+
+
+
+    <script>
+        function dragStart(event) {
+            event.dataTransfer.setData("Text", event.target.id);
+        }
+
+        // function dragging(event) {
+        //     document.getElementById("demo1").innerHTML = "物件正被拖拉中.......";
+        // }
+
+        // function dragEnd(event){
+        //     document.getElementById("demo1").innerHTML = ".......你已經放手了.......";
+        // }
+
+        let i=0;
+        function allowDrop(event) {
+            event.preventDefault();
+            i++;
+            document.getElementById("demo2").innerHTML = "你趕快放下啦!....手會酸耶!..." + i;
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            var data = event.dataTransfer.getData("Text");
+            event.target.appendChild(document.getElementById(data));
+            document.getElementById("demo2").innerHTML = "物件已完成拖拉!!!";
+        }
+
+        // function dropLeave(event){
+        //     event.preventDefault();
+        //     document.getElementById("demo3").innerHTML = "^^^^^^你已經棄我而去^^^^^^";
+        // }
+    </script>
+</body>
+
+</html>

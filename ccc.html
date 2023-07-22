@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* CSS 樣式 */
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .sidebar {
+            height: 100vh; /* 設定側邊導覽列的高度為視窗高度 */
+            width: 200px; /* 設定側邊導覽列的寬度 */
+            background-color: #f1f1f1; /* 設定側邊導覽列的背景顏色 */
+            float: left; /* 讓側邊導覽列靠左浮動 */
+        }
+        
+        .sidebar a {
+            display: block; /* 讓導覽列項目以塊級元素顯示 */
+            color: black; /* 設定導覽列項目的文字顏色 */
+            padding: 16px; /* 設定導覽列項目的內距 */
+            text-decoration: none; /* 移除導覽列項目的下劃線 */
+        }
+        
+        .sidebar a:hover {
+            background-color: #555; /* 當滑鼠指向導覽列項目時，變更背景顏色 */
+            color: white; /* 當滑鼠指向導覽列項目時，變更文字顏色 */
+        }
+        
+        .content {
+            margin-left: 200px; /* 讓內容區塊的左邊界空出側邊導覽列的寬度 */
+            padding: 16px; /* 設定內容區塊的內距 */
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <!-- 側邊導覽列的項目 -->
+        <a href="clocktest.html">項目1</a>
+        <a href="#">項目2</a>
+        <a href="#">項目3</a>
+        <a href="#">項目4</a>
+    </div>
+    
+    <div class="content">
+        <!-- 內容區塊 -->
+        <h1>左方導覽列範例</h1>
+        <p>這是一個使用 HTML 和 CSS 建立的簡單左方導覽列。</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "bower": "^1.8.14",
+    "fullcalendar": "^6.1.8",
+    "schedulejs": "^0.6.3"
+  }
+}

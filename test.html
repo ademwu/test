@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- 彈出視窗-->
+    <!-- <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/index.global.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.8/index.global.min.js'></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src='fullcalendar/core/index.global.js'></script> <!-- 語言-->
+</head>
+<style>
+    .btn:not(.btn-outline):not(.btn-dashed):not(.border-hover):not(.border-active):not(.btn-flush):not(.btn-icon) {
+        border: 0;
+        padding: calc(0.775rem + 1px) calc(1.5rem + 1px);
+    }
+
+    .btn.btn-primary {
+        color: #FFFFFF;
+        border-color: #72d4e1;
+        background-color: #72d4e1;
+
+    }
+
+    .btn.btn-primary:hover {
+        background-color: #4f9bda;
+    }
+
+    .swal2-popup .btn {
+        margin: 15px 5px 0;
+    }
+
+    .btn-active-light {
+        background-color: #D0D0D0;
+    }
+
+    .btn-active-light:hover {
+        background-color: #9D9D9D;
+    }
+
+    .fc-day-today {
+        background: #53FF53 !important;
+    }
+
+    .fc-daygrid-bg-harness {
+        background-color: yellow !important;
+        /* color: red !important; */
+    }
+
+    /* .fc .fc-col-header-cell-cushion {
+  display: inline-block;
+  padding: 2px 4px;
+} */
+</style>
+
+<body>
+    <div id="kt_docs_fullcalendar_selectable"></div>
+    <!-- <button id="my-button">aaaaaaa</button> -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById("kt_docs_fullcalendar_selectable");
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                headerToolbar: {
+                    left: "dayGridMonth,timeGridWeek,timeGridDay",
+                    center: "title",
+                    right: "prev,next today"
+                },
+                buttonText: {
+                    today: '本月',
+                    month: '月',
+                    week: '週',
+                    day: '天',
+                    list: 'list'
+                },
+                locale: 'zh-tw',
+                initialDate: "2023-09-25",
+                navLinks: true,
+                selectable: true,
+                selectMirror: true,
+               
+
+
+                // var bg = document.getElementsByClassName("fc-daygrid-day-number");
+
+
+
+
+                select: function (day) {
+                    var elements = document.querySelectorAll(".fc-daygrid-bg-harness");
+                    for (var i = 0; i < elements.length; i++) {
+                        elements[i].classList.remove("fc-daygrid-bg-harness");
+                    }
+                    this.classList.add("fc-daygrid-bg-harness");
+                    // calendar.unselect();
+                },
+
+
+                // Create new event
+                select: function (arg) {
+                    Swal.fire({
+                        html: "<div>是否建立新行程？</div><div>行程名稱:</div><input type='text'name='event_name' />",
+                        icon: "info",
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        confirmButtonText: "確認",
+                        cancelButtonText: "取消",
+
+                        customClass: {
+                            confirmButton: "btn btn-primary",
+                            cancelButton: "btn btn-active-light"
+                        }
+                    }).then(function (result) {
+                        if (result.value) {
+                            var title = document.querySelector("input[name='event_name']").value;
+                            if (title) {
+                                calendar.addEvent({
+                                    title: title,
+                                    start: arg.start,
+                                    end: arg.end,
+                                    allDay: arg.allDay
+                                });
+                                Swal.fire({
+                                    text: "已建立新行程",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "確認",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                });
+
+                            }
+                            calendar.unselect();
+                        } else if (result.dismiss === "cancel") {
+                            Swal.fire({
+                                text: "您取消活動建立",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "確認",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            });
+                        }
+                    });
+                },
+
+                //Delete event
+                eventClick: function (arg) {
+                    Swal.fire({
+                        text: "是否刪除此行程?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        confirmButtonText: "確認",
+                        cancelButtonText: "取消",
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        customClass: {
+                            confirmButton: "btn btn-primary",
+                            cancelButton: "btn btn-active-light"
+                        }
+                    }).then(function (result) {
+                        if (result.value) {
+                            arg.event.remove();
+                            Swal.fire({
+                                text: "已刪除行程",
+                                icon: "success",
+                                buttonsStyling: false,
+                                confirmButtonText: "確認",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            });
+                        } else if (result.dismiss === "cancel") {
+                            Swal.fire({
+                                text: "您取消動作",
+                                icon: "error",
+                                buttonsStyling: false,
+                                confirmButtonText: "確認",
+                                customClass: {
+                                    confirmButton: "btn btn-primary"
+                                }
+                            });
+                        }
+                    });
+                },
+                editable: true,
+                dayMaxEvents: true,
+                events: [
+                    {
+                        title: "All Day Event",
+                        start: "2023-09-01"
+                    },
+                    {
+                        title: "Long Event",
+                        start: "2023-09-07",
+                        end: "2023-09-10"
+                    },
+                    {
+                        groupId: 999,
+                        title: "Repeating Event",
+                        start: "2023-09-09T16:00:00"
+                    },
+                    {
+                        groupId: 999,
+                        title: "Repeating Event",
+                        start: "2023-09-16T16:00:00"
+                    },
+                    {
+                        title: "Conference",
+                        start: "2023-09-11",
+                        end: "2023-09-13"
+                    },
+                    {
+                        title: "Meeting",
+                        start: "2023-09-12T10:30:00",
+                        end: "2023-09-12T12:30:00"
+                    },
+                    {
+                        title: "Lunch",
+                        start: "2023-09-12T12:00:00"
+                    },
+                    {
+                        title: "Meeting",
+                        start: "2023-09-12T14:30:00"
+                    },
+                    {
+                        title: "Happy Hour",
+                        start: "2023-09-12T17:30:00"
+                    },
+                    {
+                        title: "Dinner",
+                        start: "2023-09-12T20:00:00"
+                    },
+                    {
+                        title: "Birthday Party",
+                        start: "2023-09-13T07:00:00"
+                    },
+                    {
+                        title: "Click for Google",
+                        url: "http://google.com/",
+                        start: "2023-09-28"
+                    }
+                ]
+            });
+
+            calendar.render();
+
+        });
+
+
+    </script>
+</body>
+
+</html>

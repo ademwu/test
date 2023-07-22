@@ -1,0 +1,129 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<style>
+    canvas {
+        background: #eee;
+    }
+
+    #image {
+        img {
+            display: block;
+            width: 300px;
+            height: 200px;
+        }
+    }
+</style>
+<canvas id="mycanvas" width="600" height="400"></canvas>
+<div>
+    <button id="clear">清除</button>
+    <button id="convertToImage">轉圖</button>
+</div>
+<div id="image"></div>
+
+<script>
+    // init canvas element
+    var canvas = document.getElementById('mycanvas')
+    var ctx = canvas.getContext("2d")
+
+
+    // 抗鋸齒
+    // ref: https://www.zhihu.com/question/37698502
+    let width = canvas.width,
+        height = canvas.height;
+    if (window.devicePixelRatio) {
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+        canvas.height = height * window.devicePixelRatio;
+        canvas.width = width * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+
+
+    // mouse
+    function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+        };
+    }
+
+    function mouseMove(evt) {
+        var mousePos = getMousePos(canvas, evt);
+        ctx.lineCap = "round";
+        ctx.lineWidth = 2;
+        ctx.lineJoin = "round";
+        ctx.shadowBlur = 1; // 邊緣模糊，防止直線邊緣出現鋸齒 
+        ctx.shadowColor = 'black';// 邊緣顏色
+        ctx.lineTo(mousePos.x, mousePos.y);
+        ctx.stroke();
+    }
+
+    canvas.addEventListener('mousedown', function (evt) {
+        var mousePos = getMousePos(canvas, evt);
+        ctx.beginPath();
+        ctx.moveTo(mousePos.x, mousePos.y);
+        evt.preventDefault();
+        canvas.addEventListener('mousemove', mouseMove, false);
+    });
+
+    canvas.addEventListener('mouseup', function () {
+        canvas.removeEventListener('mousemove', mouseMove, false);
+    }, false);
+
+
+    // touch
+    function getTouchPos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.touches[0].clientX - rect.left,
+            y: evt.touches[0].clientY - rect.top
+        };
+    }
+
+    function touchMove(evt) {
+        // console.log("touchmove")
+        var touchPos = getTouchPos(canvas, evt);
+        // console.log(touchPos.x, touchPos.y)
+
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round"; // 繪制圓形的結束線帽
+        ctx.lineJoin = "round"; // 兩條線條交匯時，建立圓形邊角
+        ctx.shadowBlur = 1; // 邊緣模糊，防止直線邊緣出現鋸齒 
+        ctx.shadowColor = 'black'; // 邊緣顏色
+        ctx.lineTo(touchPos.x, touchPos.y);
+        ctx.stroke();
+    }
+
+    canvas.addEventListener('touchstart', function (evt) {
+        // console.log('touchstart')
+        // console.log(evt)
+        var touchPos = getTouchPos(canvas, evt);
+        ctx.beginPath(touchPos.x, touchPos.y);
+        ctx.moveTo(touchPos.x, touchPos.y);
+        evt.preventDefault();
+        canvas.addEventListener('touchmove', touchMove, false);
+    });
+
+    canvas.addEventListener('touchend', function () {
+        // console.log("touchend")
+        canvas.removeEventListener('touchmove', touchMove, false);
+    }, false);
+
+
+    // clear
+    document.getElementById('clear').addEventListener('click', function () {
+        // console.log("reset")
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }, false);
+
+
+    // convertToImage
+    document.getElementById('convertToImage').addEventListener('click', function () {
+        console.log("convertToImage")
+        var image = canvas.toDataURL("image/png");
+        $('#image').html("<img src='" + image + "' alt='from canvas'/>");
+    }, false);
+
+</script>

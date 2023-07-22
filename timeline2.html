@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <script type="text/javascript"
+    src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"></script>
+  <link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet"
+    type="text/css" />
+
+<!-- 先引入moment.js，這次刪除了integrity屬性 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js"></script>
+
+
+<script type="text/javascript" src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"></script>
+<link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css" />
+ 
+
+
+<div id="visualization"></div>
+
+<script>
+    // 設定moment.js的完整中文本地化
+    moment.locale('zh-cn', {
+      months : '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
+      monthsShort : '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
+      monthsParseExact : true,
+      weekdays : '星期日_星期一_星期二_星期三_星期四_星期五_星期六'.split('_'),
+      weekdaysShort : '周日_周一_周二_周三_周四_周五_周六'.split('_'),
+      weekdaysMin : '日_一_二_三_四_五_六'.split('_'),
+      weekdaysParseExact : true,
+      longDateFormat : {
+        LT : 'HH:mm',
+        LTS : 'HH:mm:ss',
+        L : 'YYYY年MM月DD日',
+        LL : 'YYYY年MM月DD日',
+        LLL : 'YYYY年MM月DD日 HH:mm',
+        LLLL : 'YYYY年MM月DD日 HH:mm',
+      },
+      calendar : {
+        sameDay : '[今天] LT',
+        nextDay : '[明天] LT',
+        nextWeek : 'dddd [下周] LT',
+        lastDay : '[昨天] LT',
+        lastWeek : 'dddd [上周] LT',
+        sameElse : 'L',
+      },
+      relativeTime : {
+        future : '%s後',
+        past : '%s前',
+        s : '幾秒',
+        m : '一分鐘',
+        mm : '%d分鐘',
+        h : '一小時',
+        hh : '%d小時',
+        d : '一天',
+        dd : '%d天',
+        M : '一個月',
+        MM : '%d個月',
+        y : '一年',
+        yy : '%d年',
+      },
+      dayOfMonthOrdinalParse : /\d{1,2}(日|月|年)/,
+      ordinal : function (number, period) {
+        switch (period) {
+          case 'd':
+          case 'D':
+          case 'DDD':
+            return number + '日';
+          case 'M':
+            return number + '月';
+          case 'y':
+          case 'Y':
+            return number + '年';
+          default:
+            return number;
+        }
+      },
+      meridiemParse : /凌晨|早上|上午|中午|下午|晚上/,
+      meridiemHour : function (hour, meridiem) {
+        if (hour === 12) {
+          hour = 0;
+        }
+        if (meridiem === '凌晨' || meridiem === '早上' ||
+            meridiem === '上午') {
+          return hour;
+        } else if (meridiem === '下午' || meridiem === '晚上') {
+          return hour + 12;
+        } else {
+          // '中午'
+          return hour >= 11 ? hour : hour + 12;
+        }
+      },
+      meridiem : function (hour, minute, isLower) {
+        var hm = hour * 100 + minute;
+        if (hm < 600) {
+          return '凌晨';
+        } else if (hm < 900) {
+          return '早上';
+        } else if (hm < 1130) {
+          return '上午';
+        } else if (hm < 1230) {
+          return '中午';
+        } else if (hm < 1800) {
+          return '下午';
+        } else {
+          return '晚上';
+        }
+      },
+    });
+  </script>
+</html>
